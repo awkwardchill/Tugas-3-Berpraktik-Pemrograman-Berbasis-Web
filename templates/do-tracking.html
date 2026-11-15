@@ -1,92 +1,56 @@
 <template id="tpl-do-tracking">
+  <div class="card">
+    <div class="card-header">
+      <h2>Tracking Delivery Order (DO)</h2>
+      <p>Pantau status pengiriman bahan ajar mahasiswa</p>
+    </div>
 
-<!-- Tambahkan bar pencarian di atas tabel -->
-<div class="search-box" style="margin-bottom: 15px; display: flex; gap: 10px;">
-  <input
-    type="text"
-    v-model="searchQuery"
-    @keyup.enter="submitSearch"
-    @keyup.esc="resetSearch"
-    placeholder="Cari Nomor DO atau NIM (Enter untuk cari, Esc untuk reset)..."
-    style="flex: 1; padding: 8px 12px; border-radius: 6px; border: 1px solid #ccc;"
-  />
-  <button class="btn btn-primary" @click="submitSearch">Cari</button>
-  <button class="btn btn-secondary" @click="resetSearch">Reset</button>
-</div>
+    <div class="search-box" style="margin-bottom: 15px; display: flex; gap: 10px;">
+      <input
+        type="text"
+        v-model="searchQuery"
+        @keyup.enter="submitSearch"
+        @keyup.esc="resetSearch"
+        placeholder="Cari Nomor DO atau NIM (Enter untuk cari, Esc untuk reset)..."
+        style="flex: 1; padding: 8px 12px; border-radius: 6px; border: 1px solid #ccc;"
+      />
+      <button class="btn btn-primary" @click="submitSearch">Cari</button>
+      <button class="btn btn-secondary" @click="resetSearch">Reset</button>
+    </div>
 
-<!-- Ubah iterasi v-for menjadi filteredTracking serta terapkan filter & tombol + Progress -->
-<tr v-for="(item, key) in filteredTracking" :key="key">
-  <td>{{ key }}</td>
-  <td>{{ item.nim }}</td>
-  <td>{{ item.nama }}</td>
-  <td>{{ item.ekspedisi }}</td>
-  <td>{{ item.paket }}</td>
-  <td>{{ item.tanggalKirim | tanggalIndo }}</td>
-  <td>{{ item.total | rupiah }}</td>
-  <td>
-    <button class="check-btn" @click="showPerjalanan(item)">Check</button>
-    <button class="btn btn-sm btn-primary" @click="tambahPerjalanan(key)">+ Progress</button>
-  </td>
-</tr>
-                v-for="(item,key) in trackingList"
-                :key="key">
-
-                <td>{{ key }}</td>
-
-                <td>{{ item.nim }}</td>
-
-                <td>{{ item.nama }}</td>
-
-                <td>
-
-                    <span
-                        v-if="typeof item.ekspedisi === 'object'">
-
-                        {{ item.ekspedisi.kode }}
-                        -
-                        {{ item.ekspedisi.nama }}
-
-                    </span>
-
-                    <span v-else>
-
-                        {{ item.ekspedisi }}
-
-                    </span>
-
-                </td>
-
-                <td>{{ item.paket }}</td>
-
-                <td>{{ item.tanggalKirim }}</td>
-
-                <td>
-
-                    Rp
-                    {{ item.total.toLocaleString('id-ID') }}
-
-                </td>
-
-                <td>
-
-                    <button
-                        class="check-btn"
-                        @click="showPerjalanan(item)">
-
-                        <i class="fa-solid fa-eye"></i>
-
-                        Check
-
-                    </button>
-
-                </td>
-
-            </tr>
-
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nomor DO</th>
+            <th>NIM</th>
+            <th>Nama</th>
+            <th>Ekspedisi</th>
+            <th>Paket</th>
+            <th>Tanggal Kirim</th>
+            <th>Total</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="Object.keys(filteredTracking).length === 0">
+            <td colspan="8" style="text-align: center;">Data DO tidak ditemukan</td>
+          </tr>
+          <tr v-for="(item, key) in filteredTracking" :key="key">
+            <td>{{ key }}</td>
+            <td>{{ item.nim }}</td>
+            <td>{{ item.nama }}</td>
+            <td>{{ item.ekspedisi }}</td>
+            <td>{{ item.paket }}</td>
+            <td>{{ item.tanggalKirim | tanggalIndo }}</td>
+            <td>{{ item.total | rupiah }}</td>
+            <td>
+              <button class="check-btn" @click="showPerjalanan(item)">Check</button>
+              <button class="btn btn-sm btn-primary" @click="tambahPerjalanan(key)">+ Progress</button>
+            </td>
+          </tr>
         </tbody>
-
-    </table>
-
-</div>
-
+      </table>
+    </div>
+  </div>
 </template>

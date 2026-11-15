@@ -1,102 +1,101 @@
 <template id="tpl-stock-table">
-  <div class="section-wrap">
-
-    <div class="section-header">
+  <div class="card">
+    <div class="card-header">
       <h2>Stok Bahan Ajar</h2>
       <p>Informasi stok bahan ajar di UPBJJ Universitas Terbuka</p>
     </div>
 
-    <div class="filter-bar">
+    <!-- Filter & Aksi -->
+    <div class="filter-bar" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; align-items: center;">
       <select v-model="filterUpbjj">
         <option value="">Semua UPBJJ</option>
         <option v-for="u in upbjjList" :key="u" :value="u">{{ u }}</option>
       </select>
+
+      <!-- Dependent Option: baru muncul setelah UT-Daerah dipilih -->
       <select v-model="filterKategori" v-if="filterUpbjj">
-       <option value="">Semua Kategori</option>
-       <option v-for="k in kategoriList" :key="k" :value="k">{{ k }}</option>
+        <option value="">Semua Kategori</option>
+        <option v-for="k in kategoriList" :key="k" :value="k">{{ k }}</option>
       </select>
+
       <select v-model="sortBy">
         <option value="">Urutan Default</option>
         <option value="judul">Judul A-Z</option>
         <option value="qty">Qty</option>
         <option value="harga">Harga</option>
       </select>
-      <label>
-        <input type="checkbox" v-model="onlyWarning"> Hanya Stok Warning
+
+      <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+        <input type="checkbox" v-model="onlyWarning" />
+        Hanya Stok Warning
       </label>
-      <button class="btn btn-secondary" @click="resetFilter">
-        <i class="fa-solid fa-rotate-left"></i> Reset
-      </button>
-      <button class="btn btn-primary" @click="openTambahForm">
-        <i class="fa-solid fa-plus"></i> Tambah
-      </button>
+
+      <button class="btn btn-secondary" @click="resetFilter">Reset</button>
+      <button class="btn btn-primary" @click="openTambahForm">Tambah</button>
     </div>
 
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Kode</th>
-          <th>Judul</th>
-          <th>Kategori</th>
-          <th>UPBJJ</th>
-          <th>Lokasi Rak</th>
-          <th>Harga</th>
-          <th>Qty</th>
-          <th>Safety</th>
-          <th>Status</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-if="filteredData.length === 0">
-          <td colspan="10" style="text-align:center;padding:20px">
-            Tidak ada data
-          </td>
-        </tr>
-        <tr
-          v-for="item in filteredData"
-          :key="item.kode"
-          :class="{ 'row-warning': item.qty < item.safety || item.qty === 0 }">
-          <td>{{ item.kode }}</td>
-          <td>{{ item.judul }}</td>
-          <td>{{ item.kategori }}</td>
-          <td>{{ item.upbjj }}</td>
-          <td>{{ item.lokasiRak }}</td>
-          <td>{{ item.harga | rupiah }}</td>
-          <td>{{ item.qty | satuanBuah }}</td>
-          <td>{{ item.safety | satuanBuah }}</td>
-          <td class="status-cell" :title="item.catatanHTML">
-            <status-badge :qty="item.qty" :safety="item.safety"></status-badge>
-            <div v-if="item.catatanHTML" class="tooltip-catatan" v-html="item.catatanHTML"></div>
-          </td>
-          <td>
-            <button class="btn btn-sm btn-warning" @click="editData(item)">
-              <i class="fa-solid fa-pen"></i>
-            </button>
-            <button class="btn btn-sm btn-danger" @click="hapusData(item)">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Tabel Stok -->
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Kode</th>
+            <th>Judul</th>
+            <th>Kategori</th>
+            <th>UPBJJ</th>
+            <th>Lokasi Rak</th>
+            <th>Harga</th>
+            <th>Qty</th>
+            <th>Safety</th>
+            <th>Status</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="filteredData.length === 0">
+            <td colspan="10" style="text-align: center;">Tidak ada data</td>
+          </tr>
+          <tr v-for="item in filteredData" :key="item.kode">
+            <td>{{ item.kode }}</td>
+            <td>{{ item.judul }}</td>
+            <td>{{ item.kategori }}</td>
+            <td>{{ item.upbjj }}</td>
+            <td>{{ item.lokasiRak }}</td>
+            <td>{{ item.harga | rupiah }}</td>
+            <td>{{ item.qty | satuanBuah }}</td>
+            <td>{{ item.safety | satuanBuah }}</td>
+            <td class="status-cell">
+              <status-badge :qty="item.qty" :safety="item.safety"></status-badge>
+              <div v-if="item.catatanHTML" class="tooltip-catatan" v-html="item.catatanHTML"></div>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-warning" @click="editData(item)">Edit</button>
+              <button class="btn btn-sm btn-danger" @click="hapusData(item)">Hapus</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-    <!-- FORM MODAL -->
+    <!-- Modal Form Tambah / Edit -->
     <div class="modal-overlay" v-if="showForm" @click.self="showForm=false">
       <div class="modal-form" @keyup.enter="konfirmasiSimpan">
         <div class="modal-header">
           <h3>{{ isEdit ? 'Edit' : 'Tambah' }} Stok</h3>
-          <button class="modal-close" @click="showForm=false">&times;</button>
+          <button class="modal-close" @click="showForm=false">×</button>
         </div>
+
         <div class="modal-body">
           <div class="form-group">
             <label>Kode</label>
-            <input v-model="form.kode" :disabled="isEdit" placeholder="Kode bahan ajar" />
+            <input type="text" v-model="form.kode" :disabled="isEdit" />
           </div>
+
           <div class="form-group">
             <label>Judul</label>
-            <input v-model="form.judul" placeholder="Judul bahan ajar" />
+            <input type="text" v-model="form.judul" />
           </div>
+
           <div class="form-group">
             <label>Kategori</label>
             <select v-model="form.kategori">
@@ -104,6 +103,7 @@
               <option v-for="k in kategoriList" :key="k" :value="k">{{ k }}</option>
             </select>
           </div>
+
           <div class="form-group">
             <label>UPBJJ</label>
             <select v-model="form.upbjj">
@@ -111,39 +111,40 @@
               <option v-for="u in upbjjList" :key="u" :value="u">{{ u }}</option>
             </select>
           </div>
+
           <div class="form-group">
             <label>Lokasi Rak</label>
-            <input v-model="form.lokasiRak" placeholder="Contoh: R1-A1" />
+            <input type="text" v-model="form.lokasiRak" />
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Harga</label>
-              <input type="number" v-model.number="form.harga" />
-            </div>
-            <div class="form-group">
-              <label>Qty</label>
-              <input type="number" v-model.number="form.qty" />
-            </div>
-            <div class="form-group">
-              <label>Safety Stock</label>
-              <input type="number" v-model.number="form.safety" />
-            </div>
+
+          <div class="form-group">
+            <label>Harga</label>
+            <input type="number" v-model.number="form.harga" />
           </div>
+
+          <div class="form-group">
+            <label>Qty</label>
+            <input type="number" v-model.number="form.qty" />
+          </div>
+
+          <div class="form-group">
+            <label>Safety Stock</label>
+            <input type="number" v-model.number="form.safety" />
+          </div>
+
           <div class="form-group">
             <label>Catatan</label>
-            <textarea v-model="form.catatanHTML" rows="3"></textarea>
+            <input type="text" v-model="form.catatanHTML" />
           </div>
         </div>
+
         <div class="modal-footer">
-          <button class="btn btn-secondary" @click="showForm=false">
-            <i class="fa-solid fa-times"></i> Batal</button>
+          <button class="btn btn-secondary" @click="showForm=false">Batal</button>
           <button class="btn btn-primary" @click="konfirmasiSimpan">
-            <i class="fa-solid fa-floppy-disk"></i>
-             {{ isEdit ? 'Update' : 'Simpan' }}
+            {{ isEdit ? 'Update' : 'Simpan' }}
           </button>
         </div>
       </div>
     </div>
-
   </div>
 </template>
