@@ -1251,3 +1251,31 @@ table td.col-nowrap {
     line-height: 1.4;
     opacity: 0.9;
 }
+
+/* ==================================== 
+   TOOLTIP CATATAN STATUS 
+   ==================================== */
+.status-cell {
+  position: relative;
+  cursor: pointer;
+}
+
+.tooltip-catatan {
+  display: none;
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2c3e50;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.status-cell:hover .tooltip-catatan {
+  display: block;
+}

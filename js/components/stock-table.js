@@ -40,17 +40,22 @@ Vue.component('ba-stock-table', {
 
     // ✅ FIX 2: sinkronisasi ketika prop stok berubah (setelah API load)
     watch: {
-        stok: {
-            immediate: true,
-            deep: true,
-            handler(val) {
-                if (val) {
-                    this.localStok =
-                        JSON.parse(JSON.stringify(val));
-                }
-            }
+    stok: {
+      immediate: true,
+      deep: true,
+      handler(val) {
+        if (val) {
+          this.localStok = JSON.parse(JSON.stringify(val));
         }
+      }
     },
+    // Watcher ke-2: reset filterKategori otomatis jika UT-Daerah berubah/dikosongkan
+    filterUpbjj(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.filterKategori = '';
+      }
+    }
+  },
 
     computed: {
         filteredData() {

@@ -11,9 +11,9 @@
         <option value="">Semua UPBJJ</option>
         <option v-for="u in upbjjList" :key="u" :value="u">{{ u }}</option>
       </select>
-      <select v-model="filterKategori">
-        <option value="">Semua Kategori</option>
-        <option v-for="k in kategoriList" :key="k" :value="k">{{ k }}</option>
+      <select v-model="filterKategori" v-if="filterUpbjj">
+       <option value="">Semua Kategori</option>
+       <option v-for="k in kategoriList" :key="k" :value="k">{{ k }}</option>
       </select>
       <select v-model="sortBy">
         <option value="">Urutan Default</option>
@@ -62,13 +62,12 @@
           <td>{{ item.kategori }}</td>
           <td>{{ item.upbjj }}</td>
           <td>{{ item.lokasiRak }}</td>
-          <td>{{ item.harga }}</td>
-          <td>{{ item.qty }}</td>
-          <td>{{ item.safety }}</td>
-          <td>
-            <span v-if="item.qty === 0" class="badge badge-danger">Kosong</span>
-            <span v-else-if="item.qty < item.safety" class="badge badge-warning">Menipis</span>
-            <span v-else class="badge badge-success">Aman</span>
+          <td>{{ item.harga | rupiah }}</td>
+          <td>{{ item.qty | satuanBuah }}</td>
+          <td>{{ item.safety | satuanBuah }}</td>
+          <td class="status-cell" :title="item.catatanHTML">
+            <status-badge :qty="item.qty" :safety="item.safety"></status-badge>
+            <div v-if="item.catatanHTML" class="tooltip-catatan" v-html="item.catatanHTML"></div>
           </td>
           <td>
             <button class="btn btn-sm btn-warning" @click="editData(item)">
@@ -84,7 +83,7 @@
 
     <!-- FORM MODAL -->
     <div class="modal-overlay" v-if="showForm" @click.self="showForm=false">
-      <div class="modal-box">
+      <div class="modal-form" @keyup.enter="konfirmasiSimpan">
         <div class="modal-header">
           <h3>{{ isEdit ? 'Edit' : 'Tambah' }} Stok</h3>
           <button class="modal-close" @click="showForm=false">&times;</button>

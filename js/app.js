@@ -58,7 +58,27 @@ async function loadAllTemplates() {
 
     if (!data) return;
 
-   
+   /* =========================== VUE FILTERS =========================== */
+Vue.filter('rupiah', function (value) {
+  if (value === null || value === undefined) return 'Rp 0';
+  return 'Rp ' + Number(value).toLocaleString('id-ID');
+});
+
+Vue.filter('satuanBuah', function (value) {
+  if (value === null || value === undefined) return '0 buah';
+  return value + ' buah';
+});
+
+Vue.filter('tanggalIndo', function (value) {
+  if (!value) return '-';
+  const bulan = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+  ];
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return value;
+  return `${date.getDate()} ${bulan[date.getMonth()]} ${date.getFullYear()}`;
+});
 
     new Vue({
 
